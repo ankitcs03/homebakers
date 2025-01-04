@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to Our Bakery</h1>
+<p>We are a company dedicated to making the finest bakery products. Our mission is to bring joy to our customers through delicious and high-quality baked goods.</p>
+
+<div class="home-content">
+    <img src="{{ url_for('static', filename='images/cake.jpg') }}" alt="Delicious Cake" class="home-image">
+    <div class="home-text">
+        <h2>A Lot Can Happen Over Cake</h2>
+        <p>At our bakery, we believe that every celebration deserves a special cake. Whether it's a birthday, anniversary, or just a sweet craving, our cakes are crafted to perfection to make every moment memorable. Indulge in our wide variety of flavors and designs, and let us be a part of your special occasions.</p>
+        <p>Our skilled bakers use only the finest ingredients to create cakes that are not only visually stunning but also irresistibly delicious. From classic chocolate to exotic fruit flavors, we have something for everyone. Visit us and experience the magic of our bakery!</p>
+    </div>
+</div>
+
+{% if not session.get('logged_in') %}
+<div class="auth-options">
+    <a href="{{ url_for('user.register') }}" class="btn">Register</a>
+    <a href="{{ url_for('user.login') }}" class="btn">Login</a>
+</div>
+{% endif %}
+{% endblock %}

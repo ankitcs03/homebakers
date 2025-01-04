@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Add Item to Inventory{% endblock %}
+
+{% block content %}
+<h1>Add Item to Inventory</h1>
+<form id="addItemToInventoryForm" data-url="{{ url_for('inventory.add_item_to_inventory') }}">
+    <div class="form-group">
+        <label for="item">Select Item:</label>
+        <select name="item" id="item" required>
+            <option value="" disabled selected>Choose item from the list</option>
+            {% for unique_item in unique_items %}
+                <option value="{{ unique_item.id }}">{{ unique_item.name }} (Barcode: {{ unique_item.barcode }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">Quantity:</label>
+        <input type="number" name="quantity" id="quantity" min="1" required>
+    </div>
+
+    <div class="form-group date-container">
+        <div class="date-group">
+            <label for="manufacturing_date">Manufacturing Date:</label>
+            <input type="date" name="manufacturing_date" id="manufacturing_date" required>
+        </div>
+        <div class="date-group">
+            <label for="expiry_date">Expiry Date:</label>
+            <input type="date" name="expiry_date" id="expiry_date" required>
+        </div>
+    </div>
+
+    <button type="submit">Add to Inventory</button>
+</form>
+
+<!-- Modal for Success/Error Message -->
+<div id="messageModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeMessageModal">&times;</span>
+        <h2 id="messageTitle"></h2>
+        <p id="messageContent"></p>
+    </div>
+</div>
+
+<h2>Inventory List</h2>
+<table id="inventoryTable" class="styled-table">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Manufacturing Date</th>
+            <th>Expiry Date</th>
+            <th>Barcode</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for inventory_item in inventory_items %}
+        <tr data-id="{{ inventory_item.id }}">
+            <td>{{ inventory_item.unique_item.name }}</td>
+            <td>{{ inventory_item.quantity }}</td>
+            <td>{{ inventory_item.manufacturing_date }}</td>
+            <td>{{ inventory_item.expiry_date }}</td>
+            <td class="barcode-column-50"><img src="{{ url_for('static', filename='barcodes/' ~ inventory_item.barcode ~ '.png') }}" alt="Barcode" class="table-img-50"></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/add_item_to_inventory.js') }}"></script>
+{% endblock %}

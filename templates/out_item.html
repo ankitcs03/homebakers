@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Out Item{% endblock %}
+
+{% block content %}
+<h1>Out Item</h1>
+<form id="outItemForm">
+    <div class="form-group">
+        <label for="barcode">Scan or Enter Barcode:</label>
+        <input type="text" name="barcode" id="barcode" required>
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">Quantity:</label>
+        <input type="number" name="quantity" id="quantity" min="1" required>
+        <p id="availableQuantity" style="color: green; font-weight: bold;"></p>
+    </div>
+
+    <div class="form-group">
+        <label for="type">Type:</label>
+        <div class="radio-group">
+            <input type="radio" name="type" id="sale" value="sale" checked>
+            <label for="sale" class="radio-label">Sale</label>
+            <input type="radio" name="type" id="non-sale" value="non-sale">
+            <label for="non-sale" class="radio-label">Non-Sale</label>
+        </div>
+    </div>
+
+    <div class="form-group" id="descriptionField" style="display: none;">
+        <label for="description">Description:</label>
+        <textarea name="description" id="description"></textarea>
+    </div>
+
+    <button type="submit">Add to Basket</button>
+</form>
+
+<h2>Basket</h2>
+<table id="basketTable" class="styled-table">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Barcode</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Basket items will be added here dynamically -->
+    </tbody>
+</table>
+
+<h3>Total Price: <span id="totalPrice">0.00</span></h3>
+<button id="checkoutButton">Checkout</button>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/out_item.js') }}"></script>
+{% endblock %}

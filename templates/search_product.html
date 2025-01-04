@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Search Product{% endblock %}
+
+{% block content %}
+<h1>Search Product</h1>
+<form id="searchProductForm">
+    <div class="form-group">
+        <label for="barcode">Enter Barcode:</label>
+        <input type="text" name="barcode" id="barcode" required>
+    </div>
+    <button type="submit">Search</button>
+</form>
+
+<div id="productDetails" class="product-details" style="display: none;">
+    <h2>Product Details</h2>
+    <p><strong>Item Name:</strong> <span id="itemName"></span></p>
+    <p><strong>Price:</strong> ₹<span id="itemPrice"></span></p>
+    <p><strong>Manufacturing Date:</strong> <span id="manufacturingDate"></span></p>
+    <p><strong>Expiry Date:</strong> <span id="expiryDate"></span></p>
+    <p><strong>Description:</strong> <span id="description"></span></p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/search_product.js') }}"></script>
+{% endblock %}

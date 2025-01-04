@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Item Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 60%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        a {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Item Detail</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <td>{{ inventory_item.id }}</td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>{{ unique_item.name }}</td>
+        </tr>
+        <tr>
+            <th>Barcode</th>
+            <td>{{ inventory_item.barcode }}</td>
+        </tr>
+        <tr>
+            <th>Price</th>
+            <td>{{ unique_item.price }}</td>
+        </tr>
+        <tr>
+            <th>Quantity</th>
+            <td>{{ inventory_item.quantity }}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ unique_item.description }}</td>
+        </tr>
+        <tr>
+            <th>Manufacturing Date</th>
+            <td>{{ inventory_item.manufacturing_date.strftime('%Y-%m-%d') }}</td>
+        </tr>
+        <tr>
+            <th>Expiry Date</th>
+            <td>{{ inventory_item.expiry_date.strftime('%Y-%m-%d') }}</td>
+        </tr>
+    </table>
+
+</body>
+</html>

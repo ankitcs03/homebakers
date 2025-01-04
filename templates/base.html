@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <title>{% block title %}{% endblock %}</title>
+    </head>
+    <body>
+        <nav>
+            <ul>
+                <li><img src="{{ url_for('static', filename='images/slip-logo.png') }}" alt="Logo" class="nav-logo"></li>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('inventory.search_product') }}">Search Product</a></li>
+                {% if session.get('logged_in') %}
+                    <li><a href="{{ url_for('unique_item.add_unique_item') }}">Add Unique Item</a></li>
+                    <li><a href="{{ url_for('inventory.add_item_to_inventory') }}">Add Item</a></li>
+                    <li><a href="{{ url_for('inventory.live_inventory') }}">Live Inventory</a></li>
+                    <li><a href="{{ url_for('inventory.out_item') }}">Out Item</a></li>
+                    <li><a href="{{ url_for('inventory.view_orders') }}">View Orders</a></li>
+                    <li><a href="{{ url_for('inventory.view_non_sale_items') }}">Loss</a></li>
+                    <li><a href="{{ url_for('user.logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('user.login') }}">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+        <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

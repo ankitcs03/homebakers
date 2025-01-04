@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}View Orders{% endblock %}
+
+{% block content %}
+<h1>View Orders</h1>
+<p>Total Value: ₹{{ total_value | round(2) }}</p>
+<table class="styled-table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.unique_item.name }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.total_price }}</td>
+            <td>{{ order.date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

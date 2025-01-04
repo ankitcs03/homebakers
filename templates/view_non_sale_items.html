@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}View Non-Sale Items{% endblock %}
+
+{% block content %}
+<h1>Non-Sale Items</h1>
+<p>Total Value: ₹{{ total_value | round(2) }}</p>
+<table class="styled-table">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Description</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in non_sale_items %}
+        <tr>
+            <td>{{ item.item_name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

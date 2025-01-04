@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Add Unique Item{% endblock %}
+
+{% block content %}
+<h1>Add Unique Item</h1>
+<form id="addUniqueItemForm" data-url="{{ url_for('unique_item.add_unique_item') }}">
+    <div class="form-group">
+        <label for="item_name">Item Name:</label>
+        <input type="text" id="item_name" name="item_name" required>
+    </div>
+    <div class="form-group">
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" required>
+    </div>
+    <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+    </div>
+    <button type="submit">Add Item</button>
+</form>
+
+<h2>Unique Items</h2>
+<table id="uniqueItemsTable" class="styled-table">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Barcode</th>
+            <th class="actions-column">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in unique_items %}
+        <tr data-id="{{ item.id }}">
+            <td>{{ item.name }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.description }}</td>
+            <td class="barcode-column"><img src="{{ url_for('static', filename='barcodes/' ~ item.barcode ~ '.png') }}" alt="Barcode" class="unique-table-img"></td>
+            <td class="actions-column">
+                <button class="action-button" onclick="showItem('{{ item.id }}')">Show</button>
+                <button class="action-button" onclick="editItem('{{ item.id }}')">Edit</button>
+                <button class="delete-button" onclick="deleteItem('{{ item.id }}')">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- new model to Show Item -->
+<div id="showItemModal" class="modal">
+    <div class="modal-content">
+        <span class="showClose">&times;</span>
+        <h2 id="showModalTitle">Item Details</h2>
+        <div id="itemDetails">
+            <p><strong>Item Name:</strong> <span id="detail_item_name"></span></p>
+            <p><strong>Price:</strong> <span id="detail_price"></span></p>
+            <p><strong>Description:</strong> <span id="detail_description"></span></p>
+            <p><strong>Barcode:</strong> <span id="detail_barcode"></span></p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Edit Item -->
+
+<div id="itemModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">Item Details</h2>
+        <form id="editItemForm">
+            <div class="form-group">
+                <label for="modal_item_name">Item Name:</label>
+                <input type="text" id="modal_item_name" name="item_name" required>
+            </div>
+            <div class="form-group">
+                <label for="modal_price">Price:</label>
+                <input type="number" id="modal_price" name="price" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="modal_description">Description:</label>
+                <textarea id="modal_description" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="modal_barcode">Barcode:</label>
+                <input type="text" id="modal_barcode" name="barcode" readonly>
+            </div>
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/add_unique_item.js') }}"></script>
+{% endblock %}
