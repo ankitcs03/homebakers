@@ -27,4 +27,4 @@ if __name__ == '__main__':
             root_user.approved = True
             db.session.add(root_user)
             db.session.commit()
-    app.run(debug=True)
+    app.run()
