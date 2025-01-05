@@ -169,3 +169,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+# dummy file
+static/barcodes/*
+static/qrcodes/*
+static/detail-slip/*
+instance/*
