@@ -22,7 +22,6 @@ def home():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        # import pdb; pdb.set_trace()
         if not User.query.filter_by(username=app.config['USER_NAME']).first():
             root_user = User(username=app.config['USER_NAME'])
             root_user.set_password(app.config['USER_PASSWORD'])
