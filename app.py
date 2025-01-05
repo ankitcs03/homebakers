@@ -1,3 +1,4 @@
+import base64
 from config import Config
 from flask import Flask, render_template, redirect, url_for, session
 from flask_migrate import Migrate
@@ -14,6 +15,12 @@ migrate = Migrate(app, db)
 app.register_blueprint(user_bp)
 app.register_blueprint(unique_item_bp)
 app.register_blueprint(inventory_bp)
+
+# Custom filter for base64 encoding
+def b64encode(value):
+    return base64.b64encode(value).decode('utf-8')
+
+app.jinja_env.filters['b64encode'] = b64encode
 
 @app.route('/')
 def home():

@@ -27,6 +27,7 @@ class UniqueItem(db.Model):
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200), nullable=False)
     barcode = db.Column(db.String(8), unique=True, nullable=False)
+    barcode_image = db.Column(db.LargeBinary, nullable=True)
 
     def __repr__(self):
         return f'<UniqueItem {self.name} - {self.barcode}>'
@@ -38,6 +39,9 @@ class InventoryItem(db.Model):
     manufacturing_date = db.Column(db.Date, nullable=False)
     expiry_date = db.Column(db.Date, nullable=False)
     barcode = db.Column(db.String(8), unique=True, nullable=False) 
+    barcode_image = db.Column(db.LargeBinary, nullable=True)
+    qrcode_image = db.Column(db.LargeBinary, nullable=True)
+    slip_image = db.Column(db.LargeBinary, nullable=True)
     unique_item = db.relationship('UniqueItem', backref='inventory_items')
 
     def __repr__(self):

@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 from textwrap import wrap
 import os
+import io
 
 class GenerateDetailSlipImage:
 
@@ -9,7 +10,7 @@ class GenerateDetailSlipImage:
         self.fssai_number = fssai_number
         self.contact_details = contact_details
 
-    def create_slip_image(self, item_name, item_price, manufacturing_date, expiry_date, description, barcode_path, qrcode_path, output_path):
+    def create_slip_image(self, item_name, item_price, manufacturing_date, expiry_date, description, barcode_image, qrcode_image):
         # Define the size of each slip
         slip_width, slip_height = 297, 281  # A4 size divided by 2 columns and 3 rows
 
@@ -40,11 +41,11 @@ class GenerateDetailSlipImage:
         current_y += 45  # Adjust position after banner
 
         # Add barcode and QR code below the logo
-        barcode_img = Image.open(barcode_path)
+        barcode_img = Image.open(io.BytesIO(barcode_image))
         barcode_img = barcode_img.resize((160, 60))
         image.paste(barcode_img, (margin + barcode_margin, current_y))
         
-        qrcode_img = Image.open(qrcode_path)
+        qrcode_img = Image.open(io.BytesIO(qrcode_image))
         qrcode_img = qrcode_img.resize((60, 60))
         image.paste(qrcode_img, (margin + qrcode_margin + 170, current_y))
         current_y += 65  # Adjust position after barcode and QR code
@@ -80,35 +81,40 @@ class GenerateDetailSlipImage:
                 draw.text((margin + content_margin, current_y), line, font=font, fill='black')
             current_y += line_height
 
-        # Save the image
-        image.save(output_path, 'PNG')
+        # # uncomment below code to Save the image in local directory, just full outputpath needed
+        # image.save('static/images/test-slip.png', 'PNG')
 
-def create_slip(item_name, item_price, manufacturing_date, expiry_date, description, barcode_value ):
-    barcode_path = os.path.join('static', 'barcodes', f'{barcode_value}.png')
-    qrcode_path = os.path.join('static', 'qrcodes', f'{barcode_value}.png')
-    detail_slip_path = os.path.join('static', 'detail-slip', f'{barcode_value}.png')
+        # Return the image buffer
+        image_buffer = io.BytesIO()
+        image.save(image_buffer, format='PNG')
+        image_buffer.seek(0)
+        return image_buffer.getvalue()
+
+def create_slip(item_name, item_price, manufacturing_date, expiry_date, description, barcode_value, barcode_image, qrcode_image):
     generator = GenerateDetailSlipImage(company_name="Home Bakers", fssai_number="123456789", contact_details="Contact: YYY")
-    generator.create_slip_image(
+    slip_image = generator.create_slip_image(
         item_name=item_name,
         item_price=item_price,
         manufacturing_date=manufacturing_date,
         expiry_date=expiry_date,
         description=description,
-        barcode_path=barcode_path,
-        qrcode_path=qrcode_path,
-        output_path=detail_slip_path
+        barcode_image=barcode_image,
+        qrcode_image=qrcode_image
     )
+    return slip_image
 
-if __name__ == "__main__":
-    # Example usage
-    generator = GenerateDetailSlipImage(company_name="Home Bakers", fssai_number="123456789", contact_details="Contact: YYY")
-    generator.create_slip_image(
-        item_name="Cake",
-        item_price="500",
-        manufacturing_date="2023-01-01",
-        expiry_date="2023-01-10",
-        description=" chocolate cake Delicious chocolate cake Delicious chocolate cake Delicious Delicious chocolate cake Delicious chocolate cake Delicious chocolate cake Delicious chocolate cake Delicious chocolate cake",
-        barcode_path="static/barcodes/2a2afeb9.png",
-        qrcode_path="static/qrcodes/2a2afeb9.png",
-        output_path="static/detail-slip/detail_slip.png"
-    )
+# if __name__ == "__main__":
+#     # Example usage
+#     generator = GenerateDetailSlipImage(company_name="Home Bakers", fssai_number="123456789", contact_details="Contact: YYY")
+#     with open("static/barcodes/2a2afeb9.png", "rb") as barcode_file, open("static/qrcodes/2a2afeb9.png", "rb") as qrcode_file:
+#         barcode_image = barcode_file.read()
+#         qrcode_image = qrcode_file.read()
+#         generator.create_slip_image(
+#             item_name="Cake",
+#             item_price="500",
+#             manufacturing_date="2023-01-01",
+#             expiry_date="2023-01-10",
+#             description="Delicious chocolate cake",
+#             barcode_image=barcode_image,
+#             qrcode_image=qrcode_image
+#         )

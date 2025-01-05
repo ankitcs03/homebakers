@@ -1,4 +1,5 @@
 import os
+import base64
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 from models import UniqueItem, db
 import uuid
@@ -16,13 +17,14 @@ def add_unique_item():
         description = request.form['description']
         barcode_value = str(uuid.uuid4())[:8]  # Generate an 8-character long unique barcode
         
-        barcode_value = generate_barcode_and_qrcode(barcode_value)
+        # barcode_value = generate_barcode_and_qrcode(barcode_value)
+        barcode_image, qrcode_image = generate_barcode_and_qrcode(barcode_value, qcode=True)
         
-        new_item = UniqueItem(name=item_name, price=price, description=description, barcode=barcode_value)
+        new_item = UniqueItem(name=item_name, price=price, description=description, barcode=barcode_value, barcode_image=barcode_image)
         db.session.add(new_item)
         db.session.commit()
-        
-        return jsonify(success=True, item={'id': new_item.id, 'name': item_name, 'price': price, 'description': description, 'barcode': barcode_value})
+        barcode_image_base64 = base64.b64encode(barcode_image).decode('utf-8')
+        return jsonify(success=True, item={'id': new_item.id, 'name': item_name, 'price': price, 'description': description, 'barcode': barcode_value, 'barcode_image': barcode_image_base64})
     
     unique_items = UniqueItem.query.all()
     return render_template('add_unique_item.html', unique_items=unique_items)

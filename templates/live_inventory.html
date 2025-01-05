@@ -1,72 +1,89 @@
-{% extends "base.html" %}
-
-{% block title %}Live Inventory{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Live Inventory{% endblock %} {% block
+content %}
 <h1>Live Inventory</h1>
 <p>Total Value: ₹{{ total_value | round(2) }}</p>
 <table class="styled-table" id="inventoryTable">
-    <thead>
-        <tr>
-            <th>Item Name</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Total Value</th>
-            <th>MFG Date</th>
-            <th>EXP Date</th>
-            <th>Barcode</th>
-            <th>QR Code</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for inventory_item, unique_item in inventory_items %}
-        <tr data-barcode="{{ inventory_item.barcode }}">
-            <td>{{ unique_item.name }}</td>
-            <td>{{ unique_item.price }}</td>
-            <td>{{ inventory_item.quantity }}</td>
-            <td>{{ (unique_item.price * inventory_item.quantity) | round(2) }}</td>
-            <td>{{ inventory_item.manufacturing_date }}</td>
-            <td>{{ inventory_item.expiry_date }}</td>
-            <td><img src="{{ url_for('static', filename='barcodes/' ~ inventory_item.barcode ~ '.png') }}" alt="Barcode" class="barcode-column"></td>
-            <td><img src="{{ url_for('static', filename='qrcodes/' ~ inventory_item.barcode ~ '.png') }}" alt="QR Code" class="barcode-column"></td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Item Name</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Total Value</th>
+      <th>MFG Date</th>
+      <th>EXP Date</th>
+      <th>Barcode</th>
+      <th>QR Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for inventory_item, unique_item in inventory_items %}
+    <tr data-barcode="{{ inventory_item.barcode }}">
+      <td>{{ unique_item.name }}</td>
+      <td>{{ unique_item.price }}</td>
+      <td>{{ inventory_item.quantity }}</td>
+      <td>{{ (unique_item.price * inventory_item.quantity) | round(2) }}</td>
+      <td>{{ inventory_item.manufacturing_date }}</td>
+      <td>{{ inventory_item.expiry_date }}</td>
+      <td>
+        <img
+          src="data:image/png;base64,{{ inventory_item.barcode_image | b64encode }}"
+          alt="Barcode"
+          class="barcode-column"
+        />
+      </td>
+      <td>
+        <img
+          src="data:image/png;base64,{{ inventory_item.qrcode_image | b64encode }}"
+          alt="QR Code"
+          class="barcode-column"
+        />
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 
 <!-- Modal for user input -->
 <div id="printModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closePrintModal">&times;</span>
-        <h2>Print Options</h2>
-        <form id="printForm">
-            <label for="codeType">Select Code Type:</label>
-            <select id="codeType" name="codeType">
-                <option value="barcode">Barcode</option>
-                <option value="qrcode">QR Code</option>
-                <option value="detailslip">Detail Slip</option>
-            </select>
-            <label for="numCopies" id="numCopiesLabel">Number of Copies (multiple of 4, max 40):</label>
-            <input type="number" id="numCopies" name="numCopies" min="4" step="4" max="40" required>
-            <input type="hidden" id="selectedBarcode" name="selectedBarcode">
-            <button type="button" id="previewButton">Preview</button>
-            <button type="submit">Generate PDF</button>
-        </form>
-    </div>
+  <div class="modal-content">
+    <span class="close" id="closePrintModal">&times;</span>
+    <h2>Print Options</h2>
+    <form id="printForm">
+      <label for="codeType">Select Code Type:</label>
+      <select id="codeType" name="codeType">
+        <option value="barcode">Barcode</option>
+        <option value="qrcode">QR Code</option>
+        <option value="detailslip">Detail Slip</option>
+      </select>
+      <label for="numCopies" id="numCopiesLabel"
+        >Number of Copies (multiple of 4, max 40):</label
+      >
+      <input
+        type="number"
+        id="numCopies"
+        name="numCopies"
+        min="4"
+        step="4"
+        max="40"
+        required
+      />
+      <input type="hidden" id="selectedBarcode" name="selectedBarcode" />
+      <button type="button" id="previewButton">Preview</button>
+      <button type="submit">Generate PDF</button>
+    </form>
+  </div>
 </div>
 
 <!-- Preview Modal -->
 <div id="previewModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closePreviewModal">&times;</span>
-        <h2>Print Preview</h2>
-        <iframe id="previewFrame" style="width: 100%; height: 500px;"></iframe>
-        <button id="downloadButton">Download PDF</button>
-    </div>
+  <div class="modal-content">
+    <span class="close" id="closePreviewModal">&times;</span>
+    <h2>Print Preview</h2>
+    <iframe id="previewFrame" style="width: 100%; height: 500px"></iframe>
+    <button id="downloadButton">Download PDF</button>
+  </div>
 </div>
 
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/live_inventory.js') }}"></script>
 {% endblock %}

@@ -3,7 +3,9 @@ from models import UniqueItem, InventoryItem, db, Order, NonSaleItem
 from datetime import datetime
 import io
 import uuid
+import base64
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from utility.utils import generate_barcode_and_qrcode
 from utility.image_slip import create_slip
@@ -19,30 +21,43 @@ def add_item_to_inventory():
         manufacturing_date = datetime.strptime(request.form['manufacturing_date'], '%Y-%m-%d').date()
         expiry_date = datetime.strptime(request.form['expiry_date'], '%Y-%m-%d').date()
         barcode_value = str(uuid.uuid4())[:8]  # Generate an 8-character long unique barcode
-
+        
         inventory_item = InventoryItem.query.filter_by(unique_item_id=item_id, manufacturing_date=manufacturing_date, expiry_date=expiry_date).first()
         if inventory_item:
             inventory_item.quantity += quantity
         else:
             # Generate URL for item_detail.html /item_detail/<barcode>
             webpage_link = url_for('inventory.get_item_detail', barcode=barcode_value, _external=True)
-
-            barcode_value = generate_barcode_and_qrcode(barcode_value, qcode=True, webpage_link=webpage_link, bcode=True)
-
-            inventory_item = InventoryItem(unique_item_id=item_id, quantity=quantity, manufacturing_date=manufacturing_date, expiry_date=expiry_date, barcode=barcode_value)
-            db.session.add(inventory_item)
-        
+            # generate barcode and qrcode
+            barcode_image, qrcode_image = generate_barcode_and_qrcode(barcode_value, qcode=True,webpage_link=webpage_link, bcode=True)
             # generate the details slip image
-            create_slip(
+            slip_image = create_slip(
                     item_name=UniqueItem.query.get(item_id).name,
                     item_price=UniqueItem.query.get(item_id).price, 
-                    manufacturing_date=inventory_item.manufacturing_date.strftime('%Y-%m-%d'), 
-                    expiry_date=inventory_item.expiry_date.strftime('%Y-%m-%d'), 
+                    manufacturing_date=manufacturing_date.strftime('%Y-%m-%d'), 
+                    expiry_date=expiry_date.strftime('%Y-%m-%d'), 
                     description=UniqueItem.query.get(item_id).description, 
                     barcode_value=barcode_value,
+                    barcode_image=barcode_image,
+                    qrcode_image=qrcode_image
+
                 )
+            inventory_item = InventoryItem(
+                                            unique_item_id=item_id, 
+                                            quantity=quantity, 
+                                            manufacturing_date=manufacturing_date, 
+                                            expiry_date=expiry_date, 
+                                            barcode=barcode_value, 
+                                            barcode_image=barcode_image, 
+                                            qrcode_image=qrcode_image,
+                                            slip_image=slip_image)
+            db.session.add(inventory_item)
+        
+
         db.session.commit()
         
+        barcode_image_base64 = base64.b64encode(barcode_image).decode('utf-8')
+        qrcode_image_base64 = base64.b64encode(qrcode_image).decode('utf-8')
         return jsonify(success=True, inventory_item={
             'id': inventory_item.id,
             'unique_item': {
@@ -51,7 +66,9 @@ def add_item_to_inventory():
             'quantity': inventory_item.quantity,
             'manufacturing_date': inventory_item.manufacturing_date.strftime('%Y-%m-%d'),
             'expiry_date': inventory_item.expiry_date.strftime('%Y-%m-%d'),
-            'barcode': inventory_item.barcode
+            'barcode': inventory_item.barcode,
+            'barcode_image': barcode_image_base64,
+            'qrcode_image': qrcode_image_base64
         })
     
     unique_items = UniqueItem.query.all()
@@ -148,6 +165,11 @@ def generate_pdf():
     barcode = request.form['selectedBarcode']
     preview = request.args.get('preview', 'false').lower() == 'true'
 
+    # Query the InventoryItem to get the image data
+    inventory_item = InventoryItem.query.filter_by(barcode=barcode).first()
+    if not inventory_item:
+        return jsonify({'error': 'Inventory item not found'}), 404
+
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
@@ -164,16 +186,18 @@ def generate_pdf():
         y = height - (row + 1) * cell_height
 
         if code_type == 'barcode':
-            img_path = f'static/barcodes/{barcode}.png'
+            image_data = inventory_item.barcode_image
         elif code_type == 'qrcode':
-            img_path = f'static/qrcodes/{barcode}.png'
+            image_data = inventory_item.qrcode_image
         elif code_type == 'detailslip':
-            img_path = f'static/detail-slip/{barcode}.png'
+            image_data = inventory_item.slip_image
         else:
             raise ValueError('Invalid code type')
 
-
-        c.drawImage(img_path, x + 10, y + 10, width=cell_width - 20, height=cell_height - 20)
+        if image_data:
+            image_buffer = io.BytesIO(image_data)
+            image_reader = ImageReader(image_buffer)
+            c.drawImage(image_reader, x + 10, y + 10, width=cell_width - 20, height=cell_height - 20)
 
         if (i + 1) % (rows * cols) == 0:
             c.showPage()
