@@ -55,10 +55,19 @@ inventory-app
 
 3. **Run the Application**:
    Start the Flask application:
+
    ```
    python app.py
    ```
+
    The application will be accessible at `http://127.0.0.1:5000`.
+
+4. ** DB Migration **:
+   ```
+   flask db init  # Run this only if you haven't initialized migrations before
+   flask db migrate -m "Increase password_hash length"
+   flask db upgrade
+   ```
 
 ## Usage
 

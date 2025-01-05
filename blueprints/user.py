@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+# from ..config import Config
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, session
 from models import User, db
 
 user_bp = Blueprint('user', __name__)
@@ -46,14 +47,14 @@ def logout():
 
 @user_bp.route('/admin')
 def admin():
-    if not session.get('logged_in') or session.get('username') != 'root':
+    if not session.get('logged_in') or session.get('username') != current_app.config['USER_NAME']:
         return redirect(url_for('user.login'))
     users = User.query.all()
-    return render_template('admin.html', users=users)
+    return render_template('admin.html', users=users, admin_username=current_app.config['USER_NAME'])
 
 @user_bp.route('/approve_user/<int:user_id>')
 def approve_user(user_id):
-    if not session.get('logged_in') or session.get('username') != 'root':
+    if not session.get('logged_in') or session.get('username') != current_app.config['USER_NAME']:
         return redirect(url_for('user.login'))
     user = User.query.get(user_id)
     if user:
@@ -64,10 +65,10 @@ def approve_user(user_id):
 
 @user_bp.route('/delete_user/<int:user_id>')
 def delete_user(user_id):
-    if not session.get('logged_in') or session.get('username') != 'root':
+    if not session.get('logged_in') or session.get('username') != current_app.config['USER_NAME']:
         return redirect(url_for('user.login'))
     user = User.query.get(user_id)
-    if user and user.username != 'root':
+    if user and user.username != current_app.config['USER_NAME']:
         db.session.delete(user)
         db.session.commit()
         flash(f'User {user.username} has been deleted.', 'success')
